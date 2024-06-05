@@ -40,7 +40,6 @@ function ReferralPage() {
         setBalance(data.newBalance);
         setReferralBalance(data.newReferralBalance);  
 
-     
         fetchReferralBonuses(data.no_of_referral);
       } else {
         console.error('Failed to fetch referral details:', data.message);
@@ -82,49 +81,49 @@ function ReferralPage() {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-start py-10">
-      <div className="bg-white shadow-md rounded-lg w-full max-w-4xl p-6">
-        <div className="bg-blue-900 text-white p-4 rounded-t-lg flex justify-between items-center">
-          <div>Team <span className="font-bold">{noOfReferral}</span></div>
-          <div>Team total income <span className="font-bold">Rs. {totalIncome.toFixed(2)}</span></div>
+    <div className="bg-gradient-to-r from-blue-100 to-blue-300 min-h-screen flex flex-col items-center justify-start py-10">
+      <div className="bg-white shadow-lg rounded-lg w-full max-w-4xl p-8">
+        <div className="bg-blue-700 text-white p-6 rounded-t-lg flex justify-between items-center">
+          <div>Team Members: <span className="font-bold">{noOfReferral}</span></div>
+          <div>Total Income: <span className="font-bold">Rs. {totalIncome.toFixed(2)}</span></div>
         </div>
-        <div className="bg-gray-200 p-4 flex flex-col md:flex-row justify-between items-center">
-          <div className="flex flex-col md:flex-row items-center md:space-x-4 w-full">
-            <div className="mb-2 md:mb-0 w-full">
+        <div className="bg-gray-100 p-6 flex flex-col md:flex-row justify-between items-center rounded-b-lg">
+          <div className="flex flex-col md:flex-row items-center md:space-x-4 w-full mb-4">
+            <div className="w-full mb-2 md:mb-0">
               <input
                 type="text"
                 value={referral}
                 readOnly
-                placeholder="Invitation code"
-                className="w-full p-2 rounded border border-gray-400"
+                placeholder="Invitation Code"
+                className="w-full p-3 rounded border border-gray-300"
               />
             </div>
-            <div className="w-full">
+            <div className="w-full mb-2 md:mb-0">
               <input
                 type="text"
                 value={referralLink}
                 readOnly
-                placeholder="Invite link"
-                className="w-full p-2 rounded border border-gray-400"
+                placeholder="Invite Link"
+                className="w-full p-3 rounded border border-gray-300"
               />
             </div>
             <button 
               onClick={copyToClipboard}
-              className="ml-2 bg-blue-500 text-white py-1 px-3 rounded-md hover:bg-blue-600 transition-colors"
+              className="ml-0 md:ml-2 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
             >
               Copy
             </button>
           </div>
         </div>
-        <div className="bg-blue-500 text-white p-4 rounded-t-lg mt-4">Invite Purchase Rewards</div>
-        <div className="space-y-4">
+        <div className="bg-blue-600 text-white p-4 mt-4 rounded-lg text-center">Invite Purchase Rewards</div>
+        <div className="space-y-4 mt-4">
           {referralBonuses.map((bonus) => {
             const progress = Math.min((noOfReferral / bonus.requiredReferrals) * 100, 100);
 
             return (
-              <div key={bonus.id} className={`bg-white shadow-md p-4 rounded ${bonus.received ? 'opacity-50' : ''}`}>
+              <div key={bonus.id} className={`bg-white shadow-md p-6 rounded-lg ${bonus.received ? 'opacity-50' : ''}`}>
                 <div className="flex justify-between items-center">
-                  <div>{bonus.description}</div>
+                  <div className="text-gray-700">{bonus.description}</div>
                   <div className="flex items-center">
                     <div className={`mr-2 ${bonus.received ? 'text-green-500' : 'text-red-500'}`}>
                       {bonus.received ? 'Received' : 'Pending'}
