@@ -3,7 +3,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import logo from "../../Assets/HeaderImages/logo.png";
 import profile from "../../Assets/HeaderImages/banner.png"; // Assuming you have a default profile picture
-import { FiMenu, FiX, FiUser, FiLogIn, FiLogOut, FiBriefcase, FiHome, FiInfo, FiDollarSign, FiDownload } from "react-icons/fi";
+import { FiMenu, FiX, FiUser, FiLogIn, FiLogOut, FiBriefcase, FiHome, FiInfo, FiDollarSign, FiDownload, FiPhone } from "react-icons/fi";
 import SideBar from "./SideBar";
 import { useAuth } from "../Context/Context";
 
@@ -28,9 +28,7 @@ export default function HeaderComponent() {
     navigate("/transactionHistory");
   };
 
-  const handleInvestmentSummary = () => {
-    navigate("/investmentSummary");
-  };
+  
   
   const handleDeposit = () => {
     navigate("/deposit");
@@ -42,7 +40,7 @@ export default function HeaderComponent() {
 
   return (
     <section className="top-0 py-4 bg-sky-50 fixed w-full z-30 shadow-md">
-      <div className="container mx-auto flex justify-between items-center px-4">
+       <div className="container mx-auto flex justify-between items-center px-4">
         <div className="sm:hidden">
           <button onClick={handleClick} className="text-black focus:outline-none">
             {open ? <FiX className="h-6 w-6" /> : <FiMenu className="h-6 w-6" />}
@@ -76,19 +74,25 @@ export default function HeaderComponent() {
               />
               {open && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20">
-                  <Link to="/mine" onClick={handleClick} className=" w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                  <Link to="/mine" onClick={handleClick} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                     <FiUser className="mr-2" /> Profile
                   </Link>
-                  <Link to="/profit" onClick={handleClick} className=" w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                  <Link to="/profit" onClick={handleClick} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                     <FiDollarSign className="mr-2" /> Profit
                   </Link>
-                  <button onClick={handleDeposit} className=" w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                  <button onClick={handleDeposit} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                     <FiDownload className="mr-2" /> Deposit
                   </button>
-                  <button onClick={handleWithdraw} className=" w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                  <button onClick={handleWithdraw} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                     <FiDownload className="mr-2" /> Withdraw
                   </button>
-                  <button onClick={handleLogout} className=" w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center">
+                  <button onClick={handleTransactionHistory} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                    <FiDollarSign className="mr-2" /> Transaction History
+                  </button>
+                  <Link to="/customerSupport" onClick={handleClick} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                    <FiPhone className="mr-2" /> Customer Support
+                  </Link>
+                  <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center">
                     <FiLogOut className="mr-2" /> Logout
                   </button>
                 </div>
@@ -110,7 +114,6 @@ export default function HeaderComponent() {
         handleLogout={handleLogout}
         handleDeposit={handleDeposit}
         handleWithdraw={handleWithdraw}
-        handleInvestmentSummary={handleInvestmentSummary}
         handleTransactionHistory={handleTransactionHistory}
         user={user}
       />
