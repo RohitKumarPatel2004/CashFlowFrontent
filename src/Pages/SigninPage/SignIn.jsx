@@ -37,8 +37,7 @@ const SignIn = () => {
       dispatch(loginUser(userData))
         .then((res) => {
           if (loginUser.fulfilled.match(res)) {
-            console.log(res.payload.user.no_of_referral)
-            login(res.payload.user.email,res.payload.token,res.payload.user.referral_code,res.payload.user.no_of_referral);
+            login(res.payload.user.email,res.payload.token);
             setShowSuccessPopup(true);
             setTimeout(() => {
               setShowSuccessPopup(false);
