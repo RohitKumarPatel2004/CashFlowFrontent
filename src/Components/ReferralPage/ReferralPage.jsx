@@ -2,24 +2,55 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../Context/Context';
 
 function ReferralPage() {
-  const { getAuthDetails } = useAuth();
-  const { referral, no_of_referral } = getAuthDetails();
-  
+  const [referral, setReferral] = useState('');
+  const [noOfReferral, setNoOfReferral] = useState(0);
+  const [balance, setBalance] = useState(0);
+  const [referralBalance, setReferralBalance] = useState(0);  
   const [referralLink, setReferralLink] = useState('');
   const [referralBonuses, setReferralBonuses] = useState([]);
   const [totalIncome, setTotalIncome] = useState(0);
+  const { getAuthDetails } = useAuth();
+  const { email } = getAuthDetails();
 
   useEffect(() => {
-    // Generate referral link
-    const link = `${window.location.origin}/signup?referralCode=${referral}`;
-    setReferralLink(link);
+    fetchReferralDetails();
+  }, []);
 
-    // Fetch referral bonuses from the backend (mock function for now)
-    fetchReferralBonuses();
-  }, [referral, no_of_referral]);
+  useEffect(() => {
+    if (referral) {
+      const link = `${window.location.origin}/signup?referralCode=${referral}`;
+      setReferralLink(link);
+    }
+  }, [referral]);
 
-  const fetchReferralBonuses = () => {
-    // Mock data for referral bonuses
+  const fetchReferralDetails = async () => {
+    try {
+      const response = await fetch('http://localhost:8001/api/referral/handleReferral', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setReferral(data.referral);
+        setNoOfReferral(data.no_of_referral);
+        setBalance(data.newBalance);
+        setReferralBalance(data.newReferralBalance);  
+
+     
+        fetchReferralBonuses(data.no_of_referral);
+      } else {
+        console.error('Failed to fetch referral details:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching referral details:', error);
+    }
+  };
+
+  const fetchReferralBonuses = (noOfReferral) => {
     const bonuses = [
       { id: 1, description: 'Invite 2 people to invest and buy a non-free device, you will get a bonus of Rs.50.', requiredReferrals: 2, reward: 50 },
       { id: 2, description: 'Invite 4 people to invest and buy a non-free device, you will get a bonus of Rs.150.', requiredReferrals: 4, reward: 150 },
@@ -33,7 +64,7 @@ function ReferralPage() {
 
     let income = 0;
     const updatedBonuses = bonuses.map((bonus) => {
-      if (no_of_referral >= bonus.requiredReferrals) {
+      if (noOfReferral >= bonus.requiredReferrals) {
         income += bonus.reward;
         return { ...bonus, received: true };
       } else {
@@ -54,7 +85,7 @@ function ReferralPage() {
     <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-start py-10">
       <div className="bg-white shadow-md rounded-lg w-full max-w-4xl p-6">
         <div className="bg-blue-900 text-white p-4 rounded-t-lg flex justify-between items-center">
-          <div>Team <span className="font-bold">{no_of_referral}</span></div>
+          <div>Team <span className="font-bold">{noOfReferral}</span></div>
           <div>Team total income <span className="font-bold">Rs. {totalIncome.toFixed(2)}</span></div>
         </div>
         <div className="bg-gray-200 p-4 flex flex-col md:flex-row justify-between items-center">
@@ -88,7 +119,7 @@ function ReferralPage() {
         <div className="bg-blue-500 text-white p-4 rounded-t-lg mt-4">Invite Purchase Rewards</div>
         <div className="space-y-4">
           {referralBonuses.map((bonus) => {
-            const progress = Math.min((no_of_referral / bonus.requiredReferrals) * 100, 100);
+            const progress = Math.min((noOfReferral / bonus.requiredReferrals) * 100, 100);
 
             return (
               <div key={bonus.id} className={`bg-white shadow-md p-4 rounded ${bonus.received ? 'opacity-50' : ''}`}>
@@ -98,7 +129,7 @@ function ReferralPage() {
                     <div className={`mr-2 ${bonus.received ? 'text-green-500' : 'text-red-500'}`}>
                       {bonus.received ? 'Received' : 'Pending'}
                     </div>
-                    <div>{bonus.received ? bonus.requiredReferrals : no_of_referral}/{bonus.requiredReferrals}</div>
+                    <div>{bonus.received ? bonus.requiredReferrals : noOfReferral}/{bonus.requiredReferrals}</div>
                   </div>
                 </div>
                 <div className="relative w-full h-4 bg-gray-200 rounded mt-2">

@@ -8,16 +8,12 @@ export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     email: localStorage.getItem('email') || '',
     token: localStorage.getItem('token') || '',
-    referral: localStorage.getItem('referral') || '',
-    no_of_referral:localStorage.getItem('no_of_referral') || ''
   });
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const email = localStorage.getItem('email');
     const token = localStorage.getItem('token');
-    const referral=localStorage.getItem('referral')
-    const no_of_referral=localStorage.getItem('no_of_referral')
     if (email && token) {
       setIsAuthenticated(true);
     }
@@ -29,22 +25,18 @@ export const AuthProvider = ({ children }) => {
   const login = (email, token,referral,no_of_referral) => {
     localStorage.setItem('email', email);
     localStorage.setItem('token', token);
-    localStorage.setItem('referral',referral)
-    localStorage.setItem('no_of_referral',no_of_referral)
-    setAuth({ email, token ,referral ,no_of_referral });
+    setAuth({ email, token});
     setIsAuthenticated(true);
   };
 
   const getAuthDetails = () => {
-    return { email: auth.email, token: auth.token , referral: auth.referral ,no_of_referral: auth.no_of_referral};
+    return { email: auth.email, token: auth.token };
   };
   // Function to log out and clear email and token
   const logout = () => {
     localStorage.removeItem('email');
     localStorage.removeItem('token');
-    localStorage.removeItem('referral')
-    localStorage.removeItem('no_of_referral')
-    setAuth({ email: '', token: '' ,referral:'' ,no_of_referral:''});
+    setAuth({ email: '', token: ''});
     setIsAuthenticated(false);
   };
 
