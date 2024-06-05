@@ -3,18 +3,23 @@ import axios from 'axios';
 import { InvestmentContext } from '../Store/InvestmentContext';
 import { useAuth } from '../Context/Context';
 import baseURL from '../../Pages/BaseUrl/baseURL';
+import logo from "../../Assets/HeaderImages/bundle1.png";
+
 
 const InvestmentCard = ({ id, planName, price, dailyProfit, totalRevenue, days }) => {
   const { addInvestment } = useContext(InvestmentContext);
   const { getAuthDetails } = useAuth();
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleInvest = async () => {
     const { email } = getAuthDetails();
+    setLoading(true);
+    setError('');
 
     try {
       // First API call to handle the transaction
-      const transactionResponse = await axios.post('http://localhost:8001/api/transaction/handleTransaction', {
+      const transactionResponse = await axios.post(`${baseURL}/transaction/handleTransaction`, {
         email,
         type: 'investment',
         amount: parseFloat(price)
@@ -49,33 +54,34 @@ const InvestmentCard = ({ id, planName, price, dailyProfit, totalRevenue, days }
       }
     } catch (error) {
       setError(error.response?.data?.message || 'An error occurred during the investment. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-sm w-full bg-white shadow-lg rounded-lg overflow-hidden my-4">
-      <div className="bg-indigo-600 text-white p-4">
-        <h2 className="text-center text-xl font-bold">{planName}</h2>
+    <div className="max-w-sm w-full bg-white shadow-md rounded-lg overflow-hidden my-4 transform transition duration-500 hover:scale-105">
+      <div className="bg-gradient-to-r from-green-400 to-blue-500 text-white p-4">
+        <h2 className="text-center text-2xl font-bold">{planName}</h2>
       </div>
       <div className="p-6 flex flex-col items-center">
         <div className="mb-4">
-          <img src="path_to_image" alt="Investment Plan" className="w-16 h-16 object-cover" />
+          <img src={logo}alt="Investment Plan" className="w-24 h-24 object-cover rounded-full shadow-lg border-4 border-white" />
         </div>
-        <div className="text-center">
-          <p className="text-gray-600">Price: Rs. {price}</p>
-          <p className="text-gray-600">Daily Profit: Rs. {dailyProfit}</p>
-          <p className="text-gray-600">Total Revenue: Rs. {totalRevenue}</p>
-          <p className="text-gray-600">Number of days: {days}</p>
+        <div className="text-center mb-4">
+          <p className="text-gray-800 text-lg font-semibold">Price: Rs. {price}</p>
+          <p className="text-gray-800 text-lg font-semibold">Daily Profit: Rs. {dailyProfit}</p>
+          <p className="text-gray-800 text-lg font-semibold">Total Revenue: Rs. {totalRevenue}</p>
+          <p className="text-gray-800 text-lg font-semibold">Days: {days}</p>
         </div>
-      </div>
-      <div className="bg-gray-100 p-4 text-center">
         <button
           onClick={handleInvest}
-          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg transition duration-300"
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-8 rounded-full transition duration-300"
+          disabled={loading}
         >
-          Invest
+          {loading ? 'Investing...' : 'Invest Now'}
         </button>
-        {error && <p className="text-red-500 mt-2">{error}</p>}
+        {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
     </div>
   );

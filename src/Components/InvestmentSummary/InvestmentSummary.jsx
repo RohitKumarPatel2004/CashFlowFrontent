@@ -34,16 +34,21 @@ const InvestmentSummary = () => {
       {error && <p className="text-red-500">{error}</p>}
       <div className="w-11/12 grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {investmentDetails.map((investment, index) => (
-          <div key={index} className="max-w-sm w-full bg-white shadow-lg rounded-lg overflow-hidden my-4">
-            <div className="bg-indigo-600 text-white p-4">
+          <div
+            key={index}
+            className={`max-w-sm w-full bg-white shadow-md rounded-lg overflow-hidden my-4 transform transition duration-500 hover:scale-105 ${
+              investment.days === 0 ? 'opacity-50 pointer-events-none' : ''
+            }`}
+          >
+            <div className="bg-gradient-to-r from-green-400 to-blue-500 text-white p-4">
               <h2 className="text-center text-xl font-bold">{investment.planName}</h2>
             </div>
             <div className="p-6 flex flex-col items-center">
               <div className="text-center">
-                <p className="text-gray-600">Price: Rs. {investment.price}</p>
-                <p className="text-gray-600">Daily Profit: Rs. {investment.dailyProfit}</p>
-                <p className="text-gray-600">Total Revenue: Rs. {investment.totalRevenue}</p>
-                <p className="text-gray-600">Number of days: {investment.days}</p>
+                <p className="text-gray-800">Price: Rs. {investment.price}</p>
+                <p className="text-gray-800">Daily Profit: Rs. {investment.dailyProfit}</p>
+                <p className="text-gray-800">Total Revenue: Rs. {investment.totalRevenue}</p>
+                <p className="text-gray-800">Number of days: {investment.days}</p>
               </div>
             </div>
           </div>

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { FaEdit, FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaRupeeSign } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaRupeeSign , FaEdit } from 'react-icons/fa';
 import { MdLogout, MdPassword, MdAccountBalanceWallet } from 'react-icons/md';
 import profile from "../../Assets/HeaderImages/banner.png";
 import { useAuth } from '../Context/Context';
 import baseURL from '../../Pages/BaseUrl/baseURL';
 
 const UserProfile = () => {
-  const {getAuthDetails}=useAuth()
+  const { getAuthDetails, logout } = useAuth();
   const [user, setUser] = useState({
     full_name: '',
     email: '',
@@ -25,12 +25,11 @@ const UserProfile = () => {
   const [newProfilePicture, setNewProfilePicture] = useState(null);
   const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [isEditingProfilePicture, setIsEditingProfilePicture] = useState(false);
- const {logout}=useAuth()
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      const {email}=getAuthDetails()
+      const { email } = getAuthDetails();
       if (email) {
         try {
           const response = await axios.post(`${baseURL}/profile/getprofile`, { email });
@@ -41,7 +40,9 @@ const UserProfile = () => {
               email: userData.email,
               number: userData.number,
               location: userData.location,
-              profilePicture: userData.profilePicture.data.length ? `data:image/jpeg;base64,${Buffer.from(userData.profilePicture.data).toString('base64')}` : profile,
+              profilePicture: userData.profilePicture.data.length
+                ? `data:image/jpeg;base64,${Buffer.from(userData.profilePicture.data).toString('base64')}`
+                : profile,
               joinedDate: new Date(userData.joinedDate).toLocaleDateString(),
               totalBalance: userData.balance,
             });
@@ -64,7 +65,7 @@ const UserProfile = () => {
 
   const handleLocationUpdate = async () => {
     try {
-      const response = await axios.post('http://localhost:8001/api/profile/updatelocation', {
+      const response = await axios.post(`${baseURL}/profile/updatelocation`, {
         email: user.email,
         newLocation,
       });
@@ -91,7 +92,7 @@ const UserProfile = () => {
       formData.append('profilePicture', newProfilePicture);
 
       try {
-        const response = await axios.post('#', formData, {
+        const response = await axios.post(`${baseURL}/profile/updateprofilepicture`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
         if (response.data.success) {
@@ -122,9 +123,8 @@ const UserProfile = () => {
   };
 
   const handleLogout = () => {
-    logout()
+    logout();
     navigate('/');
-    
   };
 
   if (loading) {
@@ -137,39 +137,21 @@ const UserProfile = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-10">
-      <div className="bg-white shadow-md rounded-lg w-full max-w-2xl p-6 flex flex-col items-center">
-        <div className="relative">
-          <img
-            src={user.profilePicture}
-            alt="Profile"
-            className="w-32 h-32 rounded-full border-2 border-indigo-600"
-          />
-          <button
-            onClick={() => setIsEditingProfilePicture(!isEditingProfilePicture)}
-            className="absolute bottom-0 right-0 mb-2 mr-2 text-2xl text-gray-700"
-          >
-            <FaEdit />
-          </button>
-          {isEditingProfilePicture && (
-            <div className="mt-2 flex flex-col items-center">
-              <input type="file" onChange={handleProfilePictureChange} className="border rounded p-2" />
-              <button onClick={handleProfilePictureUpdate} className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">
-                Update Profile Picture
-              </button>
-            </div>
-          )}
+      <div className="bg-white shadow-lg rounded-lg w-full max-w-md p-6 flex flex-col items-center">
+        <div className="relative w-full flex justify-center bg-gradient-to-r from-green-400 to-blue-500 text-white p-4 rounded-t-lg">
+          <img src={user.profilePicture} alt="Profile" className="w-32 h-32 rounded-full border-4 border-white shadow-lg" />
         </div>
-        <div className="mt-4 flex flex-col items-center">
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-            <FaUser className="mr-2" /> {user.full_name}
+        <div className="text-center mt-4">
+          <h2 className="text-2xl font-bold text-gray-900">
+            {user.full_name}
           </h2>
-          <p className="text-gray-600 flex items-center">
+          <p className="text-sm text-gray-600 flex items-center justify-center mt-2">
             <FaEnvelope className="mr-2" /> {user.email}
           </p>
-          <p className="text-gray-600 flex items-center">
+          <p className="text-sm text-gray-600 flex items-center justify-center mt-2">
             <FaPhone className="mr-2" /> {user.number}
           </p>
-          <div className="flex items-center mt-2">
+          <div className="flex items-center justify-center mt-2">
             {isEditingLocation ? (
               <input
                 type="text"
@@ -179,7 +161,7 @@ const UserProfile = () => {
                 className="border rounded p-2"
               />
             ) : (
-              <p className="text-gray-600 flex items-center">
+              <p className="text-sm text-gray-600 flex items-center">
                 <FaMapMarkerAlt className="mr-2" /> {user.location}
               </p>
             )}
@@ -188,12 +170,12 @@ const UserProfile = () => {
             </button>
           </div>
           {isEditingLocation && (
-            <button onClick={handleLocationUpdate} className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">
+            <button onClick={handleLocationUpdate} className="mt-2 bg-blue-500 text-white px-4 py-2 rounded">
               Update Location
             </button>
           )}
         </div>
-        <div className="mt-4">
+        <div className="mt-4 flex flex-col items-center">
           <h3 className="text-xl font-bold flex items-center">
             <MdAccountBalanceWallet className="mr-2" /> Total Balance
           </h3>
@@ -204,22 +186,22 @@ const UserProfile = () => {
         <div className="mt-6 flex space-x-4">
           <button
             onClick={handleDepositRedirect}
-            className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-8 rounded-full transition duration-300"
           >
             Deposit
           </button>
           <button
             onClick={handleWithdrawRedirect}
-            className="mt-4 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-8 rounded-full transition duration-300"
           >
             Withdraw
           </button>
         </div>
         <div className="mt-6 flex flex-col md:flex-row md:space-x-6">
-          <button onClick={handleChangePassword} className="mt-4 bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 flex items-center">
+          <button onClick={handleChangePassword} className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-8 rounded-full transition duration-300 flex">
             <MdPassword className="mr-2" /> Change Password
           </button>
-          <button onClick={handleLogout} className="mt-4 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 flex items-center">
+          <button onClick={handleLogout} className="mt-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-8 rounded-full transition duration-300 flex justify-center items-center">
             <MdLogout className="mr-2" /> Logout
           </button>
         </div>
