@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaRupeeSign, FaEdit } from 'react-icons/fa';
-import { MdLogout, MdPassword, MdAccountBalanceWallet } from 'react-icons/md';
+import { FaEnvelope, FaPhone, FaRupeeSign } from 'react-icons/fa';
+import { MdLogout, MdPassword,MdAddLocationAlt, MdAccountBalanceWallet } from 'react-icons/md';
 import profile from "../../Assets/HeaderImages/banner.png";
 import { useAuth } from '../Context/Context';
 import baseURL from '../../Pages/BaseUrl/baseURL';
-import Buffer from 'buffer';
+import EditProfileModal from './EditProfileModal'; // Import the new component
 
 const UserProfile = () => {
   const { getAuthDetails, logout } = useAuth();
@@ -22,11 +22,8 @@ const UserProfile = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [newLocation, setNewLocation] = useState('');
-  const [newProfilePicture, setNewProfilePicture] = useState(null);
-  const [isEditingLocation, setIsEditingLocation] = useState(false);
-  const [isEditingProfilePicture, setIsEditingProfilePicture] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // State for edit modal
   const [isErrorPopupOpen, setIsErrorPopupOpen] = useState(false);
   const [isSuccessPopupOpen, setIsSuccessPopupOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -48,8 +45,9 @@ const UserProfile = () => {
               email: userData.email,
               number: userData.number,
               location: userData.location,
-              profilePicture: userData.profilePicture.data.length
-                ? `data:image/jpeg;base64,${Buffer.Buffer.from(userData.profilePicture.data).toString('base64')}`
+              // userData.profilePicture.data.length
+              profilePicture:false
+                ? `data:image/png;base64,${Buffer.from(userData.profilePicture.data).toString('base64')}`
                 : profile,
               joinedDate: new Date(userData.joinedDate).toLocaleDateString(),
               totalBalance: userData.balance,
@@ -70,63 +68,6 @@ const UserProfile = () => {
 
     fetchUserProfile();
   }, [getAuthDetails]);
-
-  const handleLocationUpdate = async () => {
-    try {
-      const response = await axios.post(`${baseURL}/profile/updatelocation`, {
-        email: user.email,
-        newLocation,
-      });
-      if (response.data.success) {
-        setUser((prevState) => ({ ...prevState, location: newLocation }));
-        setNewLocation('');
-        setIsEditingLocation(false);
-      } else {
-        setError(response.data.message);
-        setIsErrorPopupOpen(true);
-        setTimeout(() => setIsErrorPopupOpen(false), 3000); // Hide error popup after 3 seconds
-      }
-    } catch (error) {
-      setError('An error occurred while updating the location');
-      setIsErrorPopupOpen(true);
-      setTimeout(() => setIsErrorPopupOpen(false), 3000); // Hide error popup after 3 seconds
-    }
-  };
-
-  const handleProfilePictureChange = (e) => {
-    setNewProfilePicture(e.target.files[0]);
-  };
-
-  const handleProfilePictureUpdate = async () => {
-    if (newProfilePicture) {
-      const formData = new FormData();
-      formData.append('email', user.email);
-      formData.append('profilePicture', newProfilePicture);
-
-      try {
-        const response = await axios.post(`${baseURL}/profile/updateprofilepicture`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-        if (response.data.success) {
-          setUser((prevState) => ({ ...prevState, profilePicture: URL.createObjectURL(newProfilePicture) }));
-          setNewProfilePicture(null);
-          setIsEditingProfilePicture(false);
-        } else {
-          setError(response.data.message);
-          setIsErrorPopupOpen(true);
-          setTimeout(() => setIsErrorPopupOpen(false), 3000); // Hide error popup after 3 seconds
-        }
-      } catch (error) {
-        setError('An error occurred while updating the profile picture');
-        setIsErrorPopupOpen(true);
-        setTimeout(() => setIsErrorPopupOpen(false), 3000); // Hide error popup after 3 seconds
-      }
-    } else {
-      setError('Please select a profile picture to upload');
-      setIsErrorPopupOpen(true);
-      setTimeout(() => setIsErrorPopupOpen(false), 3000); // Hide error popup after 3 seconds
-    }
-  };
 
   const handleDepositRedirect = () => {
     navigate('/deposit');
@@ -193,6 +134,35 @@ const UserProfile = () => {
     setIsModalOpen(false);
   };
 
+  const handleUpdateProfile = () => {
+    const { email } = getAuthDetails();
+    if (email) {
+      axios.post(`${baseURL}/profile/getprofile`, { email })
+        .then(response => {
+          if (response.data.success) {
+            const userData = response.data.userData;
+            setUser({
+              full_name: userData.full_name,
+              email: userData.email,
+              number: userData.number,
+              location: userData.location,
+              //userData.profilePicture.data.length
+              profilePicture:false 
+                ? `data:image/png;base64,${Buffer.from(userData.profilePicture.data).toString('base64')}`
+                : profile,
+              joinedDate: new Date(userData.joinedDate).toLocaleDateString(),
+              totalBalance: userData.balance,
+            });
+          } else {
+            setError('Failed to fetch user data');
+          }
+        })
+        .catch(error => {
+          setError('An error occurred while fetching user data');
+        });
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -213,53 +183,40 @@ const UserProfile = () => {
           <p className="text-sm text-gray-600 flex items-center justify-center mt-2">
             <FaPhone className="mr-2" /> {user.number}
           </p>
-          <div className="flex items-center justify-center mt-2">
-            {isEditingLocation ? (
-              <input
-                type="text"
-                placeholder="Update Location"
-                value={newLocation}
-                onChange={(e) => setNewLocation(e.target.value)}
-                className="border rounded p-2"
-              />
-            ) : (
-              <p className="text-sm text-gray-600 flex items-center">
-                <FaMapMarkerAlt className="mr-2" /> {user.location}
-              </p>
-            )}
-            <button onClick={() => setIsEditingLocation(!isEditingLocation)} className="ml-2 text-gray-500">
-              <FaEdit />
-            </button>
-            {isEditingLocation && (
-              <button onClick={handleLocationUpdate} className="ml-2 text-green-500">
-                Save
-              </button>
-            )}
-          </div>
-          <div className="mt-4 flex flex-col items-center">
-          <h3 className="text-xl font-bold flex items-center">
-            <MdAccountBalanceWallet className="mr-2" /> Total Balance
-          </h3>
-          <p className="text-2xl text-indigo-600 flex items-center">
-            <FaRupeeSign className="mr-2" /> {user.totalBalance}
+          <p className="text-sm text-gray-600 flex items-center justify-center mt-2">
+            <MdAddLocationAlt className="mr-2" /> {user.location}
           </p>
-        </div>
-        <div className="mt-6 flex space-x-4">
-          <button
-            onClick={handleDepositRedirect}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-8 rounded-full transition duration-300"
-          >
-            Deposit
-          </button>
-          <button
-            onClick={handleWithdrawRedirect}
-            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-8 rounded-full transition duration-300"
-          >
-            Withdraw
-          </button>
-        </div>
+          
+          <div className="mt-4 flex flex-col items-center">
+            <h3 className="text-xl font-bold flex items-center">
+              <MdAccountBalanceWallet className="mr-2" /> Total Balance
+            </h3>
+            <p className="text-2xl text-indigo-600 flex items-center">
+              <FaRupeeSign className="mr-2" /> {user.totalBalance}
+            </p>
+          </div>
+          <div className="mt-6 flex space-x-4">
+            <button
+              onClick={handleDepositRedirect}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-8 rounded-full transition duration-300"
+            >
+              Deposit
+            </button>
+            <button
+              onClick={handleWithdrawRedirect}
+              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-8 rounded-full transition duration-300"
+            >
+              Withdraw
+            </button>
+          </div>
         </div>
         <div className="flex flex-col items-center">
+          <button
+            onClick={() => setIsEditModalOpen(true)} // Set state to open edit modal
+            className="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-8 rounded-full transition duration-300 flex items-center"
+          >
+            Edit Profile
+          </button>
           <button
             onClick={() => setIsModalOpen(true)}
             className="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-8 rounded-full transition duration-300 flex items-center"
@@ -323,6 +280,14 @@ const UserProfile = () => {
             </form>
           </div>
         </div>
+      )}
+
+      {isEditModalOpen && (
+        <EditProfileModal
+          user={user}
+          onClose={() => setIsEditModalOpen(false)}
+          onUpdate={handleUpdateProfile}
+        />
       )}
 
       {isErrorPopupOpen && (

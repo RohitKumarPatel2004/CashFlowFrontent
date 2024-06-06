@@ -19,6 +19,7 @@ import DepositPage from "./Components/DepositPage/DepositPage.jsx";
 import WithdrawPage from "./Components/WithdrawPage/WithdrawPage.jsx";
 import TransactionHistoryPage from "./Components/TransactionHistoryPage/TransactionHistoryPage.jsx";
 import InvestmentSummary from "./Components/InvestmentSummary/InvestmentSummary.jsx";
+import EditProfileModal from "./Components/UserProfile/EditProfileModal.jsx";
 
 const Layout = lazy(() => import("./Pages/Layout/Layout.jsx"));
 const LandingPage = lazy(() => import("./Pages/Home/LandingPage.jsx"));
@@ -62,6 +63,8 @@ function AppRoutes() {
           <Route path="/withdraw" element={<WithdrawPage />} />
           <Route path="/transactionHistory" element={<TransactionHistoryPage />} />
           <Route path="/investmentSummary" element={<InvestmentSummary />} />
+          <Route path="/editProfile" element={<EditProfileModal />} />
+
 
 
 
