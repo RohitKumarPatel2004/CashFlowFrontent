@@ -38,6 +38,10 @@ export default function HeaderComponent() {
     navigate("/withdraw");
   };
 
+  const handleDashboard = () => {
+    navigate("/dashboard");
+  };
+
   return (
     <section className="top-0 py-4 bg-sky-50 fixed w-full z-30 shadow-md">
        <div className="container mx-auto flex justify-between items-center px-4">
@@ -114,6 +118,7 @@ export default function HeaderComponent() {
         handleLogout={handleLogout}
         handleDeposit={handleDeposit}
         handleWithdraw={handleWithdraw}
+        handleDashboard={handleDashboard}
         handleTransactionHistory={handleTransactionHistory}
         user={user}
       />

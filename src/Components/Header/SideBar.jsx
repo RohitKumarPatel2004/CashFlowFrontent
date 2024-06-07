@@ -4,7 +4,7 @@ import { FiUser, FiHome, FiInfo, FiBriefcase, FiDollarSign, FiDownload, FiLogOut
 import profile from "../../Assets/HeaderImages/banner.png"; 
 import { useAuth } from '../Context/Context';
 
-const SideBar = ({ isOpen, handleClick, isAuthenticated, handleLogout, handleDeposit,handleTransactionHistory, handleWithdraw, user }) => {
+const SideBar = ({ isOpen, handleClick, isAuthenticated, handleLogout, handleDeposit,handleTransactionHistory,handleDashboard ,handleWithdraw, user }) => {
   const {logout}=useAuth()
 
   return (
@@ -56,6 +56,11 @@ const SideBar = ({ isOpen, handleClick, isAuthenticated, handleLogout, handleDep
                   <li className="mb-4">
                     <button onClick={() => { handleWithdraw(); handleClick(); }} className=" py-2 flex items-center text-gray-700 hover:text-blue-700 w-full text-left">
                       <FiDollarSign className="mr-2" /> Withdraw
+                    </button>
+                  </li>
+                  <li className="mb-4">
+                    <button onClick={() => { handleDashboard(); handleClick(); }} className=" py-2 flex items-center text-gray-700 hover:text-blue-700 w-full text-left">
+                      <FiDollarSign className="mr-2" /> Dashboard
                     </button>
                   </li>
                   <li className="mb-4">
