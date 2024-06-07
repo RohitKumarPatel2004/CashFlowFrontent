@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../Context/Context';
 import baseURL from '../../Pages/BaseUrl/baseURL';
+import Popup from '../AlertPage/Popup';
 
 const WithdrawPage = () => {
   const [currentBalance, setCurrentBalance] = useState(0);
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [tradePassword, setTradePassword] = useState('');
+  const [popup, setPopup] = useState({ show: false, message: '', type: '' });
   const navigate = useNavigate();
   const { getAuthDetails } = useAuth();
 
@@ -20,11 +22,11 @@ const WithdrawPage = () => {
           setCurrentBalance(response.data.userData.balance);
         } else {
           console.error('Failed to fetch balance');
-          alert('Failed to fetch balance');
+          setPopup({ show: true, message: 'Failed to fetch balance', type: 'error' });
         }
       } catch (error) {
         console.error('Error fetching balance', error);
-        alert('Error fetching balance');
+        setPopup({ show: true, message: 'Error fetching balance', type: 'error' });
       }
     };
 
@@ -35,7 +37,7 @@ const WithdrawPage = () => {
     const { email } = getAuthDetails();
     if (withdrawAmount && tradePassword) {
       try {
-        const response = await axios.post('http://localhost:8001/api/transaction/handleTransaction', {
+        const response = await axios.post(`${baseURL}/transaction/handleTransaction`, {
           email,
           type: 'withdrawal',
           amount: parseFloat(withdrawAmount),
@@ -43,18 +45,41 @@ const WithdrawPage = () => {
         });
 
         if (response.data.success) {
-          alert(`Transaction successful. New Balance: ₹${response.data.newBalance.toFixed(2)}`);
-          navigate('/mine');
+          setCurrentBalance(response.data.newBalance);
+          setPopup({
+            show: true,
+            message: `Transaction successful. New Balance: ₹${response.data.newBalance.toFixed(2)}`,
+            type: 'success'
+          });
+          setTimeout(() => {
+            navigate('/mine');
+          }, 2000);
         } else {
-          alert(response.data.message || 'Failed to complete transaction');
+          setPopup({
+            show: true,
+            message: response.data.message || 'Failed to complete transaction',
+            type: 'error'
+          });
         }
       } catch (error) {
         console.error('Error during transaction', error);
-        alert(error.response?.data?.message || 'An error occurred during the transaction. Please try again.');
+        setPopup({
+          show: true,
+          message: error.response?.data?.message || 'An error occurred during the transaction. Please try again.',
+          type: 'error'
+        });
       }
     } else {
-      alert('Please enter withdrawal amount and trade password');
+      setPopup({
+        show: true,
+        message: 'Please enter withdrawal amount and trade password',
+        type: 'error'
+      });
     }
+  };
+
+  const handleClosePopup = () => {
+    setPopup({ show: false, message: '', type: '' });
   };
 
   return (
@@ -110,6 +135,13 @@ const WithdrawPage = () => {
           </button>
         </div>
       </div>
+      {popup.show && (
+        <Popup
+          message={popup.message}
+          type={popup.type}
+          onClose={handleClosePopup}
+        />
+      )}
     </div>
   );
 };

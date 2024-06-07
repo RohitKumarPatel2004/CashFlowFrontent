@@ -3,17 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../Context/Context';
 import baseURL from '../../Pages/BaseUrl/baseURL';
+import Popup from '../AlertPage/Popup';
 
 const DepositPage = () => {
   const [currentBalance, setCurrentBalance] = useState(0);
   const [selectedAmount, setSelectedAmount] = useState('');
   const [selectedChannel, setSelectedChannel] = useState(null);
+  const [popup, setPopup] = useState({ show: false, message: '', type: '' });
   const navigate = useNavigate();
-  const {getAuthDetails}=useAuth()
+  const { getAuthDetails } = useAuth();
 
   useEffect(() => {
     const fetchBalance = async () => {
-      const {email} = getAuthDetails();
+      const { email } = getAuthDetails();
       try {
         const response = await axios.post(`${baseURL}/profile/getprofile`, { email });
         if (response.data.success) {
@@ -32,26 +34,49 @@ const DepositPage = () => {
   const handleNextClick = async () => {
     if (selectedAmount && selectedChannel) {
       try {
-        const {email} =getAuthDetails()
-        const response = await axios.post('http://localhost:8001/api/transaction/handleTransaction', {
+        const { email } = getAuthDetails();
+        const response = await axios.post(`${baseURL}/transaction/handleTransaction`, {
           email,
           type: 'deposit',
           amount: parseFloat(selectedAmount)
         });
-        
+
         if (response.data.success) {
           setCurrentBalance(response.data.newBalance);
-          navigate('/mine');
+          setPopup({
+            show: true,
+            message: `Deposit successful! New Balance: ₹${response.data.newBalance.toFixed(2)}`,
+            type: 'success'
+          });
+          setTimeout(() => {
+            navigate('/mine');
+          }, 2000);
         } else {
-          alert('Transaction failed: ' + response.data.message);
+          setPopup({
+            show: true,
+            message: 'Transaction failed: ' + response.data.message,
+            type: 'error'
+          });
         }
       } catch (error) {
         console.error('Error processing transaction', error);
-        alert('Error processing transaction');
+        setPopup({
+          show: true,
+          message: 'Error processing transaction',
+          type: 'error'
+        });
       }
     } else {
-      alert('Please select an amount and a deposit channel');
+      setPopup({
+        show: true,
+        message: 'Please select an amount and a deposit channel',
+        type: 'error'
+      });
     }
+  };
+
+  const handleClosePopup = () => {
+    setPopup({ show: false, message: '', type: '' });
   };
 
   return (
@@ -115,6 +140,13 @@ const DepositPage = () => {
           </button>
         </div>
       </div>
+      {popup.show && (
+        <Popup
+          message={popup.message}
+          type={popup.type}
+          onClose={handleClosePopup}
+        />
+      )}
     </div>
   );
 };
