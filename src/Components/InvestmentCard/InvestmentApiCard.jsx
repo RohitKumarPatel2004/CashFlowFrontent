@@ -25,7 +25,7 @@ function InvestmentApiCard() {
   }, []);
 
   return (
-    <div className="min-h-screen mt-10 bg-gray-100 flex flex-col items-center p-4 w-full">
+    <div className="min-h-screen  bg-gray-100 flex flex-col items-center p-4 w-full">
       <div className="w-11/12 grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {investmentPlans.map((plan) => (
           <InvestmentCard

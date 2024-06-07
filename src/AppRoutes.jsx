@@ -20,6 +20,7 @@ import WithdrawPage from "./Components/WithdrawPage/WithdrawPage.jsx";
 import TransactionHistoryPage from "./Components/TransactionHistoryPage/TransactionHistoryPage.jsx";
 import InvestmentSummary from "./Components/InvestmentSummary/InvestmentSummary.jsx";
 import EditProfileModal from "./Components/UserProfile/EditProfileModal.jsx";
+import CompanyCard from "./Components/CompanyCard/CompanyCard.jsx";
 
 const Layout = lazy(() => import("./Pages/Layout/Layout.jsx"));
 const LandingPage = lazy(() => import("./Pages/Home/LandingPage.jsx"));
