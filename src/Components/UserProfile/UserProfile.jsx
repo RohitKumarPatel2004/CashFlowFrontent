@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaPhone, FaRupeeSign } from 'react-icons/fa';
-import { MdLogout, MdPassword,MdAddLocationAlt, MdAccountBalanceWallet } from 'react-icons/md';
+import { MdLogout, MdPassword, MdAddLocationAlt, MdAccountBalanceWallet } from 'react-icons/md';
 import profile from "../../Assets/HeaderImages/banner.png";
 import { useAuth } from '../Context/Context';
 import baseURL from '../../Pages/BaseUrl/baseURL';
-import EditProfileModal from './EditProfileModal'; // Import the new component
+import EditProfileModal from './EditProfileModal'; 
+import Popup from '../AlertPage/Popup'; 
 
 const UserProfile = () => {
   const { getAuthDetails, logout } = useAuth();
@@ -23,9 +24,9 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // State for edit modal
-  const [isErrorPopupOpen, setIsErrorPopupOpen] = useState(false);
-  const [isSuccessPopupOpen, setIsSuccessPopupOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); 
+  const [popupMessage, setPopupMessage] = useState('');
+  const [popupType, setPopupType] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -45,12 +46,13 @@ const UserProfile = () => {
               email: userData.email,
               number: userData.number,
               location: userData.location,
-              // userData.profilePicture.data.length
-              profilePicture:false
+              //userData.profilePicture && userData.profilePicture.data.length
+              profilePicture: false
                 ? `data:image/png;base64,${Buffer.from(userData.profilePicture.data).toString('base64')}`
                 : profile,
               joinedDate: new Date(userData.joinedDate).toLocaleDateString(),
               totalBalance: userData.balance,
+             
             });
           } else {
             setError('Failed to fetch user data');
@@ -79,9 +81,8 @@ const UserProfile = () => {
 
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
-      setError('New passwords do not match');
-      setIsErrorPopupOpen(true);
-      setTimeout(() => setIsErrorPopupOpen(false), 3000); // Hide error popup after 3 seconds
+      setPopupMessage('New passwords do not match');
+      setPopupType('error');
       return;
     }
 
@@ -93,25 +94,24 @@ const UserProfile = () => {
       });
       if (response.data.success) {
         setSuccessMessage('Password updated successfully');
-        setIsSuccessPopupOpen(true);
-        setTimeout(() => {
-          setIsSuccessPopupOpen(false);
-          setIsModalOpen(false);
-        }, 3000); // Hide success popup and close modal after 3 seconds
+        setPopupMessage('Password updated successfully');
+        setPopupType('success');
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
-        setError(''); // Clear any previous error message
+        setError('');
+        setTimeout(() => {
+          setIsModalOpen(false) 
+        },2000); 
+        
       } else {
-        setError(response.data.message);
-        setIsErrorPopupOpen(true);
-        setTimeout(() => setIsErrorPopupOpen(false), 3000); // Hide error popup after 3 seconds
+        setPopupMessage(response.data.message);
+        setPopupType('error');
       }
     } catch (error) {
       console.error('Error:', error.response.data.message);
-      setError(error.response.data.message || 'An error occurred while changing the password');
-      setIsErrorPopupOpen(true);
-      setTimeout(() => setIsErrorPopupOpen(false), 3000); // Hide error popup after 3 seconds
+      setPopupMessage(error.response.data.message || 'An error occurred while changing the password');
+      setPopupType('error');
     }
   };
 
@@ -125,13 +125,9 @@ const UserProfile = () => {
     navigate('/');
   };
 
-  const handleCloseErrorPopup = () => {
-    setIsErrorPopupOpen(false);
-  };
-
-  const handleCloseSuccessPopup = () => {
-    setIsSuccessPopupOpen(false);
-    setIsModalOpen(false);
+  const handleClosePopup = () => {
+    setPopupMessage('');
+    setPopupType('');
   };
 
   const handleUpdateProfile = () => {
@@ -146,8 +142,8 @@ const UserProfile = () => {
               email: userData.email,
               number: userData.number,
               location: userData.location,
-              //userData.profilePicture.data.length
-              profilePicture:false 
+              //userData.profilePicture && userData.profilePicture.data.length
+              profilePicture: false
                 ? `data:image/png;base64,${Buffer.from(userData.profilePicture.data).toString('base64')}`
                 : profile,
               joinedDate: new Date(userData.joinedDate).toLocaleDateString(),
@@ -212,7 +208,7 @@ const UserProfile = () => {
         </div>
         <div className="flex flex-col items-center">
           <button
-            onClick={() => setIsEditModalOpen(true)} // Set state to open edit modal
+            onClick={() => setIsEditModalOpen(true)} 
             className="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-8 rounded-full transition duration-300 flex items-center"
           >
             Edit Profile
@@ -268,7 +264,6 @@ const UserProfile = () => {
                 />
               </div>
               {error && <div className="text-red-500 mb-4">{error}</div>}
-              {successMessage && <div className="text-green-500 mb-4">{successMessage}</div>}
               <div className="flex justify-end">
                 <button onClick={() => setIsModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded mr-2">
                   Back
@@ -290,22 +285,12 @@ const UserProfile = () => {
         />
       )}
 
-      {isErrorPopupOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white rounded-lg p-8 shadow-lg w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4 text-red-600">Error</h2>
-            <p className="text-red-500 mb-4">{error}</p>
-          </div>
-        </div>
-      )}
-
-      {isSuccessPopupOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white rounded-lg p-8 shadow-lg w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4 text-green-600">Success</h2>
-            <p className="text-green-500 mb-4">{successMessage}</p>
-          </div>
-        </div>
+      {popupMessage && (
+        <Popup
+          message={popupMessage}
+          type={popupType}
+          onClose={handleClosePopup}
+        />
       )}
     </div>
   );

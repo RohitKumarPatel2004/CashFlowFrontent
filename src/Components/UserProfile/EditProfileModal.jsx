@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import baseURL from '../../Pages/BaseUrl/baseURL';
+import Popup from '../AlertPage/Popup'; // Import Popup component
 
 const EditProfileModal = ({ user, onClose, onUpdate }) => {
   const [fullName, setFullName] = useState(user.full_name);
   const [location, setLocation] = useState(user.location);
   const [profilePicture, setProfilePicture] = useState(null);
+  const [popup, setPopup] = useState({ show: false, message: '', type: '' }); // State for popup
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
@@ -30,15 +32,20 @@ const EditProfileModal = ({ user, onClose, onUpdate }) => {
       });
 
       if (response.data.success) {
+        setPopup({ show: true, message: 'Profile updated successfully!', type: 'success' }); // Show success popup
         onUpdate();
         onClose();
       } else {
-        alert('Failed to update profile');
+        setPopup({ show: true, message: response.data.message || 'Failed to update profile', type: 'error' }); // Show error popup
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('An error occurred while updating the profile');
+      setPopup({ show: true, message: 'An error occurred while updating the profile', type: 'error' }); // Show error popup
     }
+  };
+
+  const handleClosePopup = () => {
+    setPopup({ show: false, message: '', type: '' }); // Close popup
   };
 
   return (
@@ -86,6 +93,13 @@ const EditProfileModal = ({ user, onClose, onUpdate }) => {
           </div>
         </form>
       </div>
+      {popup.show && ( // Render popup if show is true
+        <Popup
+          message={popup.message}
+          type={popup.type}
+          onClose={handleClosePopup}
+        />
+      )}
     </div>
   );
 };
