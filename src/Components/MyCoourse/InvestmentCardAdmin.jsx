@@ -3,21 +3,22 @@ import axios from 'axios';
 import { InvestmentContext } from '../Store/InvestmentContext';
 import { useAuth } from '../Context/Context';
 import baseURL from '../../Pages/BaseUrl/baseURL';
-import logo from "../../Assets/HeaderImages/bundle1.png";
-import Popup from '../AlertPage/Popup';
+import logo from "../../Assets/HeaderImages/bundle2.png";
+import Popup from '../../Components/AlertPage/Popup';
 
-const InvestmentCard = ({ id, planName, price, dailyProfit, totalRevenue, days, type }) => {
+const InvestmentCardAdmin = ({ id, planName, price, dailyProfit, totalRevenue, days, type }) => {
   const { addInvestment } = useContext(InvestmentContext);
   const { getAuthDetails } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [popup, setPopup] = useState({ show: false, message: '', type: '' });
-  const isDisabled = type === 'disable';
+  const [isDisabled, setIsDisabled] = useState(type === 'disable');
 
   const handleInvest = async () => {
     const { email } = getAuthDetails();
     setLoading(true);
     setError('');
+    setIsDisabled(true);
 
     try {
       const transactionResponse = await axios.post(`${baseURL}/transaction/handleTransaction`, {
@@ -57,6 +58,7 @@ const InvestmentCard = ({ id, planName, price, dailyProfit, totalRevenue, days, 
             message: investmentResponse.data.message || 'Failed to store investment details',
             type: 'error'
           });
+          setIsDisabled(false);
         }
       } else {
         setError(transactionResponse.data.message || 'Failed to complete investment');
@@ -65,6 +67,7 @@ const InvestmentCard = ({ id, planName, price, dailyProfit, totalRevenue, days, 
           message: transactionResponse.data.message || 'Failed to complete investment',
           type: 'error'
         });
+        setIsDisabled(false);
       }
     } catch (error) {
       setError(error.response?.data?.message || 'An error occurred during the investment. Please try again.');
@@ -73,6 +76,7 @@ const InvestmentCard = ({ id, planName, price, dailyProfit, totalRevenue, days, 
         message: error.response?.data?.message || 'An error occurred during the investment. Please try again.',
         type: 'error'
       });
+      setIsDisabled(false);
     } finally {
       setLoading(false);
     }
@@ -81,6 +85,39 @@ const InvestmentCard = ({ id, planName, price, dailyProfit, totalRevenue, days, 
   const handleClosePopup = () => {
     setPopup({ show: false, message: '', type: '' });
   };
+
+  const updateInvestmentType = async (newType) => {
+    try {
+      const response = await axios.post(`${baseURL}/invest/updateTypeCard`, {
+        planName,
+        type: newType
+      });
+
+      if (response.data.success) {
+        setIsDisabled(newType === 'disable');
+        setPopup({
+          show: true,
+          message: response.data.message,
+          type: 'success'
+        });
+      } else {
+        setPopup({
+          show: true,
+          message: response.data.message || 'Failed to update investment type',
+          type: 'error'
+        });
+      }
+    } catch (error) {
+      setPopup({
+        show: true,
+        message: error.response?.data?.message || 'An error occurred while updating the investment type. Please try again.',
+        type: 'error'
+      });
+    }
+  };
+
+  const handleActivate = () => updateInvestmentType('active');
+  const handleDisable = () => updateInvestmentType('disable');
 
   return (
     <>
@@ -106,6 +143,20 @@ const InvestmentCard = ({ id, planName, price, dailyProfit, totalRevenue, days, 
             {loading ? 'Investing...' : 'Invest Now'}
           </button>
           {error && <p className="text-red-500 mt-4">{error}</p>}
+          <div className="mt-4 flex justify-between w-full">
+            <button
+              onClick={handleActivate}
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+            >
+              Activate
+            </button>
+            <button
+              onClick={handleDisable}
+              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+            >
+              Disable
+            </button>
+          </div>
         </div>
       </div>
       {popup.show && (
@@ -119,4 +170,4 @@ const InvestmentCard = ({ id, planName, price, dailyProfit, totalRevenue, days, 
   );
 };
 
-export default InvestmentCard;
+export default InvestmentCardAdmin;

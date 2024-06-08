@@ -1,9 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 
-// Create the context
 const AuthContext = createContext();
 
-// AuthProvider component to provide auth state to its children
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     email: localStorage.getItem('email') || '',
@@ -21,7 +19,6 @@ export const AuthProvider = ({ children }) => {
 
  
 
-  // Function to log in and save email and token
   const login = (email, token,referral,no_of_referral) => {
     localStorage.setItem('email', email);
     localStorage.setItem('token', token);
@@ -32,7 +29,6 @@ export const AuthProvider = ({ children }) => {
   const getAuthDetails = () => {
     return { email: auth.email, token: auth.token };
   };
-  // Function to log out and clear email and token
   const logout = () => {
     localStorage.removeItem('email');
     localStorage.removeItem('token');
@@ -40,7 +36,6 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
-  // Provide the auth state and login/logout functions to the children
   return (
     <AuthContext.Provider value={{ auth,getAuthDetails, login, logout, isAuthenticated }}>
       {children}
@@ -48,7 +43,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom hook to use the AuthContext
 export const useAuth = () => {
   return React.useContext(AuthContext);
 };

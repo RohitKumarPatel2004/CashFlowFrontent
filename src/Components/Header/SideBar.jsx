@@ -62,6 +62,19 @@ const SideBar = ({ isOpen, handleClick, isAuthenticated, handleLogout, handleDep
                     <button onClick={() => { handleDashboard(); handleClick(); }} className=" py-2 flex items-center text-gray-700 hover:text-blue-700 w-full text-left">
                       <FiDollarSign className="mr-2" /> Dashboard
                     </button>
+
+                    <ul className="pl-6 mt-2">
+                        <li className="mb-2">
+                          <NavLink to="investmentCardAdmin" onClick={handleClick} className="py-2 flex items-center text-gray-700 hover:text-blue-700">
+                            Investment Card Admin
+                          </NavLink>
+                        </li>
+                        <li className="mb-2">
+                          <NavLink to="addInvestmentCard" onClick={handleClick} className="py-2 flex items-center text-gray-700 hover:text-blue-700">
+                            Add Investment Card
+                          </NavLink>
+                        </li>
+                      </ul>
                   </li>
                   <li className="mb-4">
                     <button onClick={() => {handleTransactionHistory(); handleClick(); }} className=" py-2 flex items-center text-gray-700 hover:text-blue-700 w-full text-left">
