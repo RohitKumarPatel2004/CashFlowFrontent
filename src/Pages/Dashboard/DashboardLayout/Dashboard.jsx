@@ -49,55 +49,36 @@ function DashboardLayout() {
           <p className=" px-4 py-2 font-bold">Home</p>
           <NavLink
             className="px-4 py-2 cursor-pointer hover:bg-blue-100"
-            to=" "
+            to=""
           >
             <MdOutlineDashboard className="inline mr-2" />
             Dashboard
           </NavLink>
           <NavLink
             className="px-4 py-2 cursor-pointer hover:bg-blue-100"
-            to="mycourse"
+            to=""
           >
             <SiReadthedocs className="inline mr-2" />
-            My Course
+            Investment Card
+          </NavLink>
+          <NavLink
+            className="px-4 py-2 cursor-pointer hover:bg-blue-100"
+            to=""
+          >
+            <CgFileAdd className="inline mr-2" />
+            Add Investment Card
           </NavLink>
           <br />
           <p className="px-4 py-2 font-bold">Components</p>
           <NavLink
             className="px-4 py-2 cursor-pointer hover:bg-blue-100"
-            to="students"
+            to=""
           >
             <PiStudent className="inline mr-2" />
-            Students Details
+            Add Investment Card
           </NavLink>
-          <NavLink
-            className="px-4 py-2 cursor-pointer hover:bg-blue-100"
-            to="quizData"
-          >
-            <CgFileAdd className="inline mr-2" />
-            QuizData
-          </NavLink>
-          <NavLink
-            className="px-4 py-2 cursor-pointer hover:bg-blue-100"
-            to="quiz"
-          >
-            <CgFileAdd className="inline mr-2" />
-            Quiz
-          </NavLink>
-          <NavLink
-            className="px-4 py-2 cursor-pointer hover:bg-blue-100"
-            to="addMcq"
-          >
-            <CgFileAdd className="inline mr-2" />
-            Add MCQ Question
-          </NavLink>
-          <NavLink
-            className="px-4 py-2 cursor-pointer hover:bg-blue-100"
-            to="addCourseDetails"
-          >
-            <CgFileAdd className="inline mr-2" />
-            Add Course Details
-          </NavLink>
+      
+          
           <NavLink
             className="px-4 py-2 cursor-pointer hover:bg-blue-100"
             to="task"

@@ -39,7 +39,7 @@ export default function HeaderComponent() {
   };
 
   const handleDashboard = () => {
-    navigate("/dashboard");
+    navigate("/dashboarda");
   };
 
   return (
@@ -84,6 +84,30 @@ export default function HeaderComponent() {
                   <Link to="/profit" onClick={handleClick} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                     <FiDollarSign className="mr-2" /> Profit
                   </Link>
+
+
+                  <li className="">
+                    <button onClick={() => { handleDashboard(); handleClick(); }} className=" w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                      <FiDollarSign className="mr-2" /> Dashboard
+                    </button>
+
+                    <ul className="pl-6 ">
+                        <li className="mb-2">
+                          <NavLink to="investmentCardAdmin" onClick={handleClick} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                            Investment Card Admin
+                          </NavLink>
+                        </li>
+                        <li className="mb-2">
+                          <NavLink to="addInvestmentCard" onClick={handleClick} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                            Add Investment Card
+                          </NavLink>
+                        </li>
+                      </ul>
+                  </li>
+
+
+
+
                   <button onClick={handleDeposit} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                     <FiDownload className="mr-2" /> Deposit
                   </button>
