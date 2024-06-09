@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const Dashboarda = () => {
+const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState({ totalUsers: 0, totalInvestors: 0, allUsersResult: [] });
   const [selectedUserInvestments, setSelectedUserInvestments] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -292,4 +292,4 @@ const Dashboarda = () => {
   );
 };
 
-export default Dashboarda;
+export default Dashboard;
