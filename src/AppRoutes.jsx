@@ -23,6 +23,7 @@ import EditProfileModal from "./Components/UserProfile/EditProfileModal.jsx";
 import Dashboarda from "./Components/Dashboard/Dashboard.jsx";
 import InvestmentCardApiAdmin from "./Components/MyCoourse/InvestmentCardApiAdmin.jsx";
 import AddInvestmentCard from "./Components/AddInvestmentCard/AddInvestmentCard.jsx";
+import AdminWithdrawalApprovalPage from "./Components/WithdrawApprove/WithdrawApprove.jsx";
 
 const Layout = lazy(() => import("./Pages/Layout/Layout.jsx"));
 const LandingPage = lazy(() => import("./Pages/Home/LandingPage.jsx"));
@@ -58,6 +59,8 @@ function AppRoutes() {
           <Route path="dashboarda" element={<Dashboarda />}/>
           <Route path="addInvestmentCard" element={<AddInvestmentCard />} />
           <Route path="investmentCardAdmin" element={<InvestmentCardApiAdmin />} />
+          <Route path="withdrawApprovel" element={<AdminWithdrawalApprovalPage />} />
+
           
           
          

@@ -102,6 +102,11 @@ export default function HeaderComponent() {
                             Add Investment Card
                           </NavLink>
                         </li>
+                        <li className="mb-2">
+                          <NavLink to="withdrawApprovel" onClick={handleClick} className="py-2 flex items-center text-gray-700 hover:text-blue-700">
+                            WithDraw Approvel
+                          </NavLink>
+                        </li>
                       </ul>
                   </li>
 
