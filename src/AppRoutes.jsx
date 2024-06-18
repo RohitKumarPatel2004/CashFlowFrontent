@@ -18,6 +18,7 @@ import Profit from "./Components/ProfitPage/ProfitPage.jsx";
 import ReferralPage from "./Components/ReferralPage/ReferralPage.jsx";
 import UserProfile from "./Components/UserProfile/UserProfile.jsx";
 import CustomerSupport from "./Components/CustomerSupport/CustomerSupport.jsx";
+import SuperAdminWithdrawalApprovalPage from "./Components/WithdrawApprove/SuperAdminApprove.jsx";
 
 const Layout = lazy(() => import("./Pages/Layout/Layout.jsx"));
 const LandingPage = lazy(() => import("./Pages/Home/LandingPage.jsx"));
@@ -163,6 +164,14 @@ function AppRoutes() {
             element={
               <Suspense fallback={<Spinner />}>
                 <AdminWithdrawalApprovalPage />
+              </Suspense>
+            }
+          />
+           <Route
+            path="adminWithdrawApprovel"
+            element={
+              <Suspense fallback={<Spinner />}>
+                <SuperAdminWithdrawalApprovalPage />
               </Suspense>
             }
           />
