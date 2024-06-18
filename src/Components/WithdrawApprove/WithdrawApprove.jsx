@@ -29,13 +29,35 @@ const AdminWithdrawalApprovalPage = () => {
       const endpoint = action === 'approve' ? '/approveWithrawal/approveWithdrawal' : '/approveWithrawal/rejectWithdrawal';
       const response = await axios.post(`${baseURL}${endpoint}`, { transactionId });
       if (response.data.success) {
-        setWithdrawals(withdrawals.filter(withdrawal => withdrawal.id !== transactionId));
+        setWithdrawals(withdrawals.filter(withdrawal => withdrawal.transaction_id !== transactionId));
         setSuccess(`Withdrawal ${action}d successfully`);
       } else {
         setError(`Failed to ${action} withdrawal`);
       }
     } catch (error) {
       setError(`An error occurred while trying to ${action} withdrawal`);
+    }
+  };
+
+  const handleBulkApproval = async (action) => {
+    const endpoint = action === 'approve' ? '/approveWithrawal/approveWithdrawal' : '/approveWithrawal/rejectWithdrawal';
+
+    for (const withdrawal of withdrawals) {
+      try {
+        const response = await axios.post(`${baseURL}${endpoint}`, { transactionId: withdrawal.transaction_id });
+        if (response.data.success) {
+          setWithdrawals(prevWithdrawals => prevWithdrawals.filter(w => w.transaction_id !== withdrawal.transaction_id));
+        } else {
+          setError(`Failed to ${action} some withdrawals`);
+          break; // Break the loop if any rejection fails
+        }
+      } catch (error) {
+        setError(`An error occurred while trying to ${action} some withdrawals`);
+        break; // Break the loop if an error occurs
+      }
+    }
+    if (!error) {
+      setSuccess(`All withdrawals ${action}d successfully`);
     }
   };
 
@@ -46,6 +68,21 @@ const AdminWithdrawalApprovalPage = () => {
         {success && <p className="text-green-600 text-center mb-4">{success}</p>}
         {error && <p className="text-red-600 text-center mb-4">{error}</p>}
         
+        <div className="flex justify-end mb-4">
+          <button
+            className="bg-green-500 text-white px-4 py-2 rounded mr-2"
+            onClick={() => handleBulkApproval('approve')}
+          >
+            Approve All
+          </button>
+          <button
+            className="bg-red-500 text-white px-4 py-2 rounded"
+            onClick={() => handleBulkApproval('reject')}
+          >
+            Reject All
+          </button>
+        </div>
+
         <table className="w-full bg-white rounded-lg overflow-hidden text-sm">
           <thead className="bg-gray-200">
             <tr>
@@ -65,13 +102,13 @@ const AdminWithdrawalApprovalPage = () => {
                   <td className="py-2 px-4">
                     <button
                       className="bg-green-500 text-white px-3 py-1 rounded mr-2"
-                      onClick={() => handleApproval(withdrawal.id, 'approve')}
+                      onClick={() => handleApproval(withdrawal.transaction_id, 'approve')}
                     >
                       Approve
                     </button>
                     <button
                       className="bg-red-500 text-white px-3 py-1 rounded"
-                      onClick={() => handleApproval(withdrawal.id, 'reject')}
+                      onClick={() => handleApproval(withdrawal.transaction_id, 'reject')}
                     >
                       Decline
                     </button>

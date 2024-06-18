@@ -103,10 +103,15 @@ export default function HeaderComponent() {
                           </NavLink>
                         </li>
                         <li className="mb-2">
-                          <NavLink to="withdrawApprovel" onClick={handleClick} className="py-2 flex items-center text-gray-700 hover:text-blue-700">
-                            WithDraw Approvel
-                          </NavLink>
-                        </li>
+                        <NavLink to="/withdrawApprovel" onClick={handleClick} className="py-1 flex items-center text-gray-700 hover:text-blue-700 text-xs">
+                           Admin Withdraw Approval
+                        </NavLink>
+                      </li>
+                      <li className="mb-2">
+                        <NavLink to="/adminWithdrawApprovel" onClick={handleClick} className="py-1 flex items-center text-gray-700 hover:text-blue-700 text-xs">
+                         Super a Withdraw Approval
+                        </NavLink>
+                      </li>
                       </ul>
                   </li>
 
