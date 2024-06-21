@@ -37,7 +37,7 @@ const SignIn = () => {
       dispatch(loginUser(userData))
         .then((res) => {
           if (loginUser.fulfilled.match(res)) {
-            login(res.payload.user.email,res.payload.token);
+            login(res.payload.user.email,res.payload.token,res.payload.user.userType);
             setShowSuccessPopup(true);
             setTimeout(() => {
               setShowSuccessPopup(false);
