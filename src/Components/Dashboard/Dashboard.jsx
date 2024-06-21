@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const Dashboard = () => {
-  const [dashboardData, setDashboardData] = useState({ totalUsers: 0, totalInvestors: 0, allUsersResult: [] });
+  const [dashboardData, setDashboardData] = useState({ totalUsers: 0, totalInvestors: 0, allAdminData:[], allUsersResult: [] });
   const [selectedUserInvestments, setSelectedUserInvestments] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [searchInput, setSearchInput] = useState('');
@@ -15,6 +15,8 @@ const Dashboard = () => {
   const [totalInvestmentTo, setTotalInvestmentTo] = useState('');
   const [totalProfitFrom, setTotalProfitFrom] = useState('');
   const [totalProfitTo, setTotalProfitTo] = useState('');
+  const [userTypeUpdating, setUserTypeUpdating] = useState(null);
+
 
   useEffect(() => {
     axios.get('http://localhost:8001/api/adminDashboard/getAdminDashboardData')
@@ -35,6 +37,26 @@ const Dashboard = () => {
         }
       })
       .catch((error) => console.error('Error fetching investment details:', error));
+  };
+
+  const handleUserTypeChange = (email, userType) => {
+    setUserTypeUpdating(email);
+    axios.put('http://localhost:8001/api/adminDashboard/modifyUserType', { email, userType })
+      .then((response) => {
+        if (response.data.success) {
+          setDashboardData(prevState => ({
+            ...prevState,
+            allUsersResult: prevState.allUsersResult.map(user =>
+              user.email === email ? { ...user, userType } : user
+            )
+          }));
+          setUserTypeUpdating(null);
+        }
+      })
+      .catch((error) => {
+        console.error('Error updating user type:', error);
+        setUserTypeUpdating(null);
+      });
   };
 
   const handleSearchInput = (e) => {
@@ -212,6 +234,7 @@ const Dashboard = () => {
                   <th className="py-3 px-4 text-left">Joined Date</th>
                   <th className="py-3 px-4 text-left">Total Investment</th>
                   <th className="py-3 px-4 text-left">Total Profit</th>
+                  <th className="py-3 px-4 text-left">userType</th>
                   <th className="py-3 px-4 text-left">Actions</th>
                 </tr>
               </thead>
@@ -230,6 +253,21 @@ const Dashboard = () => {
                     <td className="py-2 px-4 text-left">{new Date(user.joinedDate).toLocaleDateString()}</td>
                     <td className="py-2 px-4 text-left">{user.totalInvestment}</td>
                     <td className="py-2 px-4 text-left">{user.totalDailyProfit}</td>
+                    <td className="px-4 py-2">
+                    {userTypeUpdating === user.email ? (
+                      <span>Updating...</span>
+                    ) : (
+                      <select
+                        value={user.userType}
+                        onChange={(e) => handleUserTypeChange(user.email, e.target.value)}
+                        className="bg-gray-600 text-white p-2 rounded focus:outline-none"
+                      >
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                        <option value="superAdmin">Super Admin</option>
+                      </select>
+                    )}
+                  </td>
                     <td className="py-2 px-4 text-left">
                       <button
                         className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
@@ -286,6 +324,114 @@ const Dashboard = () => {
           </div>
         )}
 
+       {/* User Data Table */}
+       <div className="bg-gray-600 p-4 rounded-lg shadow mb-6">
+          <h2 className="text-gray-300 mb-4">All Admins</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-gray-700 text-sm text-white">
+              <thead className="bg-gray-600 text-gray-300 uppercase text-xs leading-normal">
+                <tr>
+                  <th className="py-3 px-4 text-left">ID</th>
+                  <th className="py-3 px-4 text-left">Full Name</th>
+                  <th className="py-3 px-4 text-left">Email</th>
+                  <th className="py-3 px-4 text-left">Balance</th>
+                  <th className="py-3 px-4 text-left">Number</th>
+                  <th className="py-3 px-4 text-left">Location</th>
+                  <th className="py-3 px-4 text-left">Referral Code</th>
+                  <th className="py-3 px-4 text-left">No. of Referrals</th>
+                  <th className="py-3 px-4 text-left">Referral Balance</th>
+                  <th className="py-3 px-4 text-left">Joined Date</th>
+                  <th className="py-3 px-4 text-left">Total Investment</th>
+                  <th className="py-3 px-4 text-left">Total Profit</th>
+                  <th className="py-3 px-4 text-left">userType</th>
+                  <th className="py-3 px-4 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="text-gray-300 text-xs font-light">
+                {dashboardData.allAdminData.map((users) => (
+                  <tr key={users.id} className="border-b border-gray-600 hover:bg-gray-700">
+                    <td className="py-2 px-4 text-left">{users.id}</td>
+                    <td className="py-2 px-4 text-left">{users.full_name}</td>
+                    <td className="py-2 px-4 text-left">{users.email}</td>
+                    <td className="py-2 px-4 text-left">{users.balance}</td>
+                    <td className="py-2 px-4 text-left">{users.number}</td>
+                    <td className="py-2 px-4 text-left">{users.location}</td>
+                    <td className="py-2 px-4 text-left">{users.referral_code}</td>
+                    <td className="py-2 px-4 text-left">{users.no_of_referral}</td>
+                    <td className="py-2 px-4 text-left">{users.referral_balance}</td>
+                    <td className="py-2 px-4 text-left">{new Date(users.joinedDate).toLocaleDateString()}</td>
+                    <td className="py-2 px-4 text-left">{users.totalInvestment}</td>
+                    <td className="py-2 px-4 text-left">{users.totalDailyProfit}</td>
+                    <td className="px-4 py-2">
+                    {userTypeUpdating === users.email ? (
+                      <span>Updating...</span>
+                    ) : (
+                      <select
+                        value={users.userType}
+                        onChange={(e) => handleUserTypeChange(users.email, e.target.value)}
+                        className="bg-gray-600 text-white p-2 rounded focus:outline-none"
+                      >
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                        <option value="superAdmin">Super Admin</option>
+                      </select>
+                    )}
+                  </td>
+                    <td className="py-2 px-4 text-left">
+                      <button
+                        className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                        onClick={() => handleInvestmentDetails(users.email)}
+                      >
+                        Investment Details
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Investment Details Modal */}
+        {selectedUserId && (
+          <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center z-50">
+            <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-[90%] max-w-3xl">
+              <h2 className="text-gray-300 mb-4">Investment Details for {selectedUserId}</h2>
+              <div className="overflow-x-auto">
+                <table className="min-w-full bg-gray-800 text-xs text-white">
+                  <thead className="bg-gray-600 text-gray-300 uppercase text-xs leading-normal">
+                    <tr>
+                      <th className="py-2 px-4 text-left">Plan Name</th>
+                      <th className="py-2 px-4 text-left">Price</th>
+                      <th className="py-2 px-4 text-left">Daily Profit</th>
+                      <th className="py-2 px-4 text-left">Total Revenue</th>
+                      <th className="py-2 px-4 text-left">Days</th>
+                      <th className="py-2 px-4 text-left">Time</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-gray-300 text-xs font-light">
+                    {selectedUserInvestments.map((investment, index) => (
+                      <tr key={index} className="border-b border-gray-600 hover:bg-gray-700">
+                        <td className="py-2 px-4 text-left">{investment.planName}</td>
+                        <td className="py-2 px-4 text-left">{investment.price}</td>
+                        <td className="py-2 px-4 text-left">{investment.dailyProfit}</td>
+                        <td className="py-2 px-4 text-left">{investment.totalRevenue}</td>
+                        <td className="py-2 px-4 text-left">{investment.days}</td>
+                        <td className="py-2 px-4 text-left">{new Date(investment.time).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <button
+                className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                onClick={() => setSelectedUserId(null)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
         
       </div>
     </div>
